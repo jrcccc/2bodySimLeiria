@@ -16,7 +16,7 @@ dt=2*vM0/baseAccel/20
 def getAccel(posMerc_old, velMerc_old, alpha = 0, beta = 0):
 
 	# Compute the strength of the acceleration
-	correction = 1 + alpha*rS/np.linalg.norm(posMerc_old) + beta*rL2/np.linalg.norm(posMerc_old)**2
+	correction = 1
 	accelMag = baseAccel * correction/np.linalg.norm(posMerc_old)**2
 	# Multiply by the direction
 	accelMerc = -accelMag * (posMerc_old/np.linalg.norm(posMerc_old))
