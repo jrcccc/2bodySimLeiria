@@ -16,7 +16,7 @@ dt=2*vM0/baseAccel/20
 def getAccel(posMerc_old, velMerc_old, alpha = 0, beta = 0):
 
 	# Compute the strength of the acceleration
-	correction = 1
+	correction = 1 + alpha*rS/np.linalg.norm(posMerc_old) + beta*rL2/np.linalg.norm(posMerc_old)**2
 	accelMag = baseAccel * correction/np.linalg.norm(posMerc_old)**2
 	# Multiply by the direction
 	accelMerc = -accelMag * (posMerc_old/np.linalg.norm(posMerc_old))
@@ -47,19 +47,39 @@ turtle.tracer(n=1, delay=0)
 posMerc = posInit
 velMerc = velInit
 
-while t < 2*TM:
+posMercLast = posInit
+max_turns = 10
+turns = 0
+perihelion = []
+
+#while t < 2*TM:
+while turns < max_turns:
+
+	# To find the perihelion we will compare the magnitude
+	# of the distance to the Sun in three different positions
+	posMercBeforeLast = posMercLast
+	posMercLast = posMerc
 
 	# Compute Accel
-	accelMerc = getAccel(posMerc, velMerc, 0, 0)
+	accelMerc = getAccel(posMerc, velMerc, 10**5, 0)
 
 	# Update velocity vector
-	velMerc = velMerc+accelMerc*dt
+	velMerc = velMerc + accelMerc * dt
 	# Update position vector
-	posMerc = posMerc+velMerc*dt
+	posMerc = posMerc + velMerc * dt
 
 	Mercury.setpos(posMerc[0], posMerc[1])
 
+	# Time to find the perihelion. If posMercLast represents the smallest
+	# distance to the Sun then perihelion has been found.
+	if ( np.linalg.norm(posMercLast) < np.linalg.norm(posMerc) ) and ( np.linalg.norm(posMercLast) < np.linalg.norm(posMercBeforeLast) ):
+		perihelion.append(posMerc)
+		turns = turns + 1
+
 	# Move to new time
 	t = t + dt
+
+print(perihelion)
+
 
 screen.exitonclick()	
